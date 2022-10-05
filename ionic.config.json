@@ -1,0 +1,7 @@
+{
+  "name": "ionicMusic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
