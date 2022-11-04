@@ -1,7 +1,9 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import './Tab2.css';
+import './Tab1.css';
+import { Storage } from '@ionic/storage';
+import { useHistory } from 'react-router';
 
 interface ArtistProps {
   name: string;
@@ -18,6 +20,30 @@ interface AlbumsProps {
 }
 const Tab1: React.FC = () => {
   const [albums, setAlbums] = useState<AlbumsProps[]>([])
+  const [email, setEmail] = useState<string | number>("");
+  const [password, setPassword] = useState<string | number>("");
+
+  const store = new Storage();
+  let history = useHistory();
+
+  useEffect(() => {
+    const initialeStorage = async () => {
+      await store.create()
+    }
+    initialeStorage()
+  }, [store])
+
+  const handleLogin = async () => {
+    const registeredEmail = await store.get("email",)
+    const registeredPassword = await store.get("password")
+    if (password === registeredPassword && registeredEmail === email) {
+      history.push("/tab2")
+    }
+    else {
+      alert("dados incorretos")
+    }
+  }
+
   useEffect(() => {
     const fn = async () => {
       const response = await axios.get(
@@ -28,35 +54,33 @@ const Tab1: React.FC = () => {
     fn();
   }, []);
   return (
-    <IonPage>
-      <IonSearchbar />
+    <IonPage >
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Albums</IonTitle>
+          <IonTitle>Home</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonContent>
-          {albums && (
-            albums.map(album => {
-              return (
-                <IonCard className='card'>
-                  <img src={album.image[3]['#text']} alt="album cover" />
-                  <IonCardHeader>
-                    <IonCardSubtitle>{album.artist.name}</IonCardSubtitle>
-                    <IonCardTitle>{album.name}</IonCardTitle>
-
-                  </IonCardHeader>
-                  <IonCardContent>
-                    Artist info
-                  </IonCardContent>
-                </IonCard>
-              )
-            })
-          )}
-        </IonContent>
+      <IonContent  >
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin()
+        }} style={{ marginTop: "250px" }} >
+          <IonList>
+            <IonItem>
+              <IonInput onIonChange={({ target }) => setEmail(target.value!)} type="email" placeholder="email@domain.com"></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonInput onIonChange={({ target }) => setPassword(target.value!)} type="password" placeholder="Type your password"></IonInput>
+            </IonItem>
+          </IonList>
+          <div style={{ marginTop: "10px" }}>
+            <IonButton color="light" expand="block" type="submit">Login</IonButton>
+            <IonButton href='/signUp' color="light" expand="block">Cadastrar</IonButton>
+          </div>
+        </form>
       </IonContent>
     </IonPage>
+
   );
 };
 
